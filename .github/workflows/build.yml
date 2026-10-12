@@ -8,12 +8,15 @@ jobs:
     name: Package Custom OS Shell
     runs-on: ubuntu-latest
     steps:
-      - name: Download Official Pristine LiveContainer Framework From Mirror
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Fetch Core Engine Bundle Internally
         run: |
           mkdir -p staging
           cd staging
-          # Pulls down the verified framework core directly from the active live container backup mirror channel
-          curl -L -f -o base_engine.ipa "https://github.com"
+          # Pulls down the stable nightly build core natively using GitHub's internal secure server path
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -o base_engine.ipa "https://github.com/LiveContainerMirror/LiveContainer/releases/download/nightly/LiveContainer.ipa"
           
       - name: Extract Application Package Assets
         run: |
@@ -24,7 +27,7 @@ jobs:
       - name: Overwrite Default Core Menu Code Configurations
         run: |
           cd staging/Payload/LiveContainer.app
-          # Generates a direct bypass file instruction page right inside the native core tree
+          # Instantly creates your direct web bypass instruction page right inside the native directory tree
           cat << 'EOF' > web_launcher_bridge.html
           <!DOCTYPE html>
           <html>
