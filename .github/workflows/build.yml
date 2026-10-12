@@ -6,24 +6,22 @@ on:
 jobs:
   build:
     name: Package Custom OS Shell
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     steps:
-      - name: Fetch Precompiled Base Framework
-        run: |
-          mkdir -p working_dir
-          cd working_dir
-          # Clean download targeting the permanent structural engine archive mirror
-          curl -L -f -o base_lc.zip "https://r2.dev"
-          unzip base_lc.zip
-          
+      - name: Checkout Your Repository Code
+        uses: actions/checkout@v4
+
+      - name: Setup Pristine Apple Xcode Environment
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.4'
+
       - name: Inject Custom Web Interface Link
         run: |
-          cd working_dir
-          # Target the primary SwiftUI interface controller file and force-inject your layout address
+          # Automatically finds your LCTabView.swift file inside your layout and updates the URL
           TARGET_FILE=$(find . -name "LCTabView.swift" | head -n 1)
           if [ -f "$TARGET_FILE" ]; then
-            echo "Found layout configuration file at: $TARGET_FILE"
-            # Overwrites default interface structures to mirror your jajko3714-hash link viewport
+            echo "Injecting into layout file at: $TARGET_FILE"
             cat << 'EOF' > "$TARGET_FILE"
             import SwiftUI
             import WebKit
@@ -73,25 +71,17 @@ jobs:
             }
           EOF
           else
-            echo "Error: Layout target configuration file not found in file tree directory."
+            echo "Error: Layout configuration file missing."
             exit 1
           fi
 
       - name: Build Fixed Native IPA Package
         run: |
-          cd working_dir
+          # Compiles just the basic visual app shell without processing deep virtualization submodules
+          xcodebuild -project LiveContainer.xcodeproj -scheme LiveContainer -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO archive -archivePath LiveContainer.xcarchive
           mkdir -p Payload
-          # Locates the application bundle wrapper directory and moves it into deployment structures
-          APP_DIR=$(find . -name "*.app" -type d | head -n 1)
-          if [ -d "$APP_DIR" ]; then
-            cp -R "$APP_DIR" Payload/
-            zip -r ../LiveContainer.ipa Payload
-          else
-            # Creates an asset payload mapping bundle template structure fallback
-            mkdir -p Payload/LiveContainer.app
-            echo "Generating structure container" > Payload/LiveContainer.app/Info.plist
-            zip -r ../LiveContainer.ipa Payload
-          fi
+          cp -R LiveContainer.xcarchive/Products/Applications/LiveContainer.app Payload/
+          zip -r LiveContainer.ipa Payload
           
       - name: Export Ready-To-Sideload Binary Package
         uses: actions/upload-artifact@v4
