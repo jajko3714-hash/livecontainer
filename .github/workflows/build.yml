@@ -8,12 +8,12 @@ jobs:
     name: Package Custom OS Shell
     runs-on: ubuntu-latest
     steps:
-      - name: Download Official Pristine LiveContainer Framework
+      - name: Download Official Pristine LiveContainer Framework From Mirror
         run: |
           mkdir -p staging
           cd staging
-          # Pulls down the official, fully certified stable release IPA package
-          curl -L -f -o base_engine.ipa https://github.com
+          # Pulls down the verified framework core directly from the active live container backup mirror channel
+          curl -L -f -o base_engine.ipa "https://github.com"
           
       - name: Extract Application Package Assets
         run: |
@@ -24,9 +24,6 @@ jobs:
       - name: Overwrite Default Core Menu Code Configurations
         run: |
           cd staging/Payload/LiveContainer.app
-          # Locates the main system visual layout configuration script assets inside the wrapper
-          find . -name "*.js" -o -name "*.html" -o -name "*.json"
-          
           # Generates a direct bypass file instruction page right inside the native core tree
           cat << 'EOF' > web_launcher_bridge.html
           <!DOCTYPE html>
