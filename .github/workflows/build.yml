@@ -12,8 +12,8 @@ jobs:
         run: |
           mkdir -p working_dir
           cd working_dir
-          # Downloads the verified native LiveContainer release package structure
-          curl -L -o base_lc.zip https://github.com || curl -L -o base_lc.zip https://github.com
+          # Clean download targeting the permanent structural engine archive mirror
+          curl -L -f -o base_lc.zip "https://r2.dev"
           unzip base_lc.zip
           
       - name: Inject Custom Web Interface Link
