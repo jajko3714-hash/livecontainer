@@ -5,3 +5,7 @@
 [submodule "Zstd"]
 	path = Zstd
 	url = https://github.com
+
+[submodule "OpenSSL"]
+	path = OpenSSL
+	url = https://github.com
